@@ -1,5 +1,5 @@
 """
-Interfaz gráfica para los modelos de inventario EOQ.
+Interfaz grafica para los modelos de inventario EOQ.
 Usa los cálculos de eoq_faltantes.py (el backend).
 
 Ejecutar:  python3 interfaz_eoq.py
@@ -18,7 +18,7 @@ AZUL = "#1f5fa8"
 ROJO = "#b03a2e"
 VERDE = "#2e7d32"
 
-# Campos de datos: clave -> (texto, valor por defecto)
+# campos de datos: clave  (texto, valor por defecto)
 CAMPOS = {
     "D": ("Demanda anual (D)", 20000),
     "S": ("Costo de ordenar (S)", 40),
@@ -43,7 +43,7 @@ def costo_H(d):
     return d["H"] if d.get("H") else d["i"] * d["C"]
 
 
-# ---------- Formatos de resultados ----------
+#  Formatos de resultados 
 
 def unidades(r, clave):
     return f"{r[clave]:,.2f} u"
@@ -71,7 +71,7 @@ def tabla_descuentos(r):
     return "\n".join(lineas)
 
 
-# Filas de resultados: (clave, texto, formato) ; None = separador
+# filas de resultados: (clave, texto, formato)  None = separador
 SEP = None
 FILA_Q = ("Q", "Q  (cantidad óptima)", redondeo)
 FILA_SF = ("Sf", "Sf (faltante máximo)", redondeo)
@@ -88,7 +88,7 @@ FILA_N = ("N", "N  (pedidos al año)", lambda r, c: f"{r[c]:.4f}")
 FILA_T = ("T", "T  (tiempo entre órdenes)", lambda r, c: f"{r[c]:.4f} ≈ {round(r[c])} días")
 
 
-# ---------- Perfiles para la gráfica (un ciclo) ----------
+# perfiles para la grafica (un ciclo) 
 # puntos: [(t, nivel)], marcas: [(nivel, texto)] en el eje Y,
 # lineas: [(nivel, texto, color)] horizontales, tramos: [(t_ini, t_fin, texto, es_escasez)]
 
@@ -126,7 +126,7 @@ def perfil_seguridad(r):
             "lineas": [(r["SS"], f"SS={r['SS']:.1f}", ROJO), (r["R"], f"R={r['R']:.1f}", VERDE)]}
 
 
-# ---------- Definición de los modelos ----------
+# definicion de los modelos 
 
 MODELOS = {
     "EOQ clásico (sin faltantes)": {
@@ -209,7 +209,7 @@ class InterfazEOQ:
 
         self.cambiar_modelo()
 
-    # ---------- Construcción de la ventana ----------
+    # construccion de la ventana 
 
     def _crear_selector(self):
         marco = ttk.Frame(self.raiz, padding=(10, 10, 10, 0))
@@ -257,7 +257,7 @@ class InterfazEOQ:
                 continue
             clave, texto, _ = definicion
             if clave == "evaluacion":
-                # Tabla de varias líneas debajo de su título
+                # tabla de varias lineas debajo de su titulo
                 ttk.Label(marco, text=texto).grid(row=fila, column=0, sticky="nw", pady=2)
                 valor = ttk.Label(marco, text="—", font=("TkFixedFont", 10), justify="left")
                 valor.grid(row=fila + 100, column=0, columnspan=2, sticky="w", pady=2)
@@ -282,7 +282,7 @@ class InterfazEOQ:
         self.raiz.columnconfigure(1, weight=2)
         self.raiz.rowconfigure(2, weight=1)
 
-    # ---------- Lógica ----------
+    # logica 
 
     def cambiar_modelo(self):
         self.modelo = MODELOS[self.selector.get()]
@@ -342,7 +342,7 @@ class InterfazEOQ:
         self.calcular()
 
     def _dibujar_grafica(self):
-        """Dibuja el perfil del inventario del modelo elegido repetido en 2 ciclos."""
+        """dibuja el perfil del inventario del modelo elegido repetido en 2 ciclos"""
         lienzo = self.lienzo
         lienzo.delete("all")
         r = self.resultado
@@ -394,7 +394,7 @@ class InterfazEOQ:
                 else:
                     lienzo.create_text(medio, y(0) + 12, text=texto, fill=AZUL)
 
-        # Líneas de referencia (punto de reorden, inventario de seguridad)
+        # lineas de referencia (punto de reorden, inventario de seguridad)
         for nivel, texto, color in lineas:
             lienzo.create_line(margen_izq, y(nivel), ancho - margen_der, y(nivel), fill=color, dash=(6, 4))
             lienzo.create_text(ancho - margen_der, y(nivel) - 2, text=texto, anchor="se",
@@ -406,7 +406,7 @@ class InterfazEOQ:
                                text=f"{k * T:.1f} d", font=("TkDefaultFont", 9))
 
     def _rellenar(self, x, y, ta, na, tb, nb):
-        """Sombrea entre la curva y el eje: azul con inventario, rojo en escasez."""
+        """sombrea entre la curva y el eje: azul con inventario, rojo en escasez"""
         if na * nb < 0:
             tz = ta + (tb - ta) * na / (na - nb)  # cruce con el eje
             self._rellenar(x, y, ta, na, tz, 0)
